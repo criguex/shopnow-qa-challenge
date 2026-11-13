@@ -20,6 +20,7 @@ I worked with one AI agent in the terminal, driven by a written working agreemen
 | Reporting | Drafted `BUGS.md`, `ANALYSIS.md`, `TESTING.md` with diagrams, the CI workflow and the latency probe | Severity/priority calls, what is a bug vs. a question vs. a suggestion |
 | Evidence | Wrote `evidence/record-evidence.mjs` and recorded every bug: numbered steps, video with pointer and step banners, failure boxed in red with expected vs actual, HTTP log | Set the evidence standard I use at work and audited the result frame by frame |
 | Traceability | Added `case_key` / `ac` / `requirement` / `defect` + tags to every test and generated `docs/TRACEABILITY.md` | Defined the 14 acceptance criteria from the spec and the case-key scheme |
+| Project README | Wrote `.github/README.md` (+ Spanish version), the banner, the "how it works" diagram and the kids' explainer animation | Set the bar with the README of my previous challenge repo; every number in it was re-checked against real runs |
 | Fixes (optional) | One minimal `fix(BUG-xx)` commit per bug on branch `fixes` | Kept them off `main` so it still shows the bugs; used them only to prove the tests (36 red → 44/44 green) |
 
 ## What I verified and how
@@ -47,6 +48,8 @@ I worked with one AI agent in the terminal, driven by a written working agreemen
 - **Evidence links pointed to the wrong port:** the recording ran on 4322 because 4321 was busy on my machine; the links were changed to the app's real URL, and the recording port is stated in each sheet.
 - **A blank screenshot was dropped:** the "store is down" capture for BUG-03 came out empty (headless Chromium doesn't paint its error page), so it was replaced by the real server log of the crash instead of something staged.
 - **The audit found more impact:** while adding screenshots for the API bugs, the `"abc"` quantity order turned out to blank My payments and My orders for that user. Added to BUG-04 (same root cause) instead of a new bug, plus an error-boundary suggestion.
+- **The challenge README can't be edited**, so the project README lives in `.github/README.md`, which GitHub shows on the repo page; the statement stays untouched in `README.md` and is linked from the first line.
+- **A wrong count in the README draft:** it said 8 mutant tests; `--list` showed 10 (quantity and coupon mutants). Corrected before publishing.
 - **A fix broke the type check** (the stock check made `lines` an implicit `any[]`); caught with `tsc` before running the suite, fixed in its own `fix(BUG-07)` commit.
 
 ## Evidence
