@@ -49,7 +49,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const initial = useRef(readStoredCart()).current;
   const [items, setItems] = useState<CartItem[]>(initial.items);
   const [coupons, setCoupons] = useState<Coupon[]>(initial.coupons);
-  const couponAppliedRef = useRef(false);
+  const couponAppliedRef = useRef(initial.coupons.length > 0);
 
   const persist = (nextItems: CartItem[], nextCoupons: Coupon[]) => {
     setItems(nextItems);
