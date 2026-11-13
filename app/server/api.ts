@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { Router, type Request, type Response, type NextFunction } from "express";
 import { cartTotals, type Coupon } from "../shared/money.js";
-import { load, nextId, resetData, save, type Order, type User } from "./db.js";
+import { load, nextId, resetData, save, type Order, type OrderItem, type User } from "./db.js";
 
 const COUPONS: Record<string, number> = {
   FLOCK10: 10,
@@ -165,7 +165,7 @@ api.post("/checkout", requireUser, async (req, res) => {
   }
 
   const data = load();
-  const lines = [];
+  const lines: OrderItem[] = [];
   for (const item of items) {
     const product = data.products.find((p) => p.id === Number(item.productId));
     if (!product) {
