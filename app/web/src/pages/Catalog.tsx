@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { formatMoney } from "../../../shared/money";
 import { api, type Product } from "../api";
-import { mergeItem, useCart } from "../cart";
+import { useCart } from "../cart";
 import { Link } from "../router";
 
 const CATEGORIES = ["Home", "Tech", "Clothing", "Accessories"];
@@ -21,8 +21,8 @@ export function Catalog() {
   }, [query, category]);
 
   const addToCart = (product: Product) => {
-    cart.setItems((items) => mergeItem(items, product, 1));
-    setMessage(`${product.name} was added to your cart.`);
+    const error = cart.add(product, 1);
+    setMessage(error ?? `${product.name} was added to your cart.`);
   };
 
   return (
