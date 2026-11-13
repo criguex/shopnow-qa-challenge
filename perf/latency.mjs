@@ -3,7 +3,7 @@
 // Exit code 1 when a budget is broken, so it can gate a pipeline.
 
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:4321";
-const CHECKOUT_BUDGET_MS = 3000; // the web client aborts the payment request after 3 s (see BUG-01)
+const CHECKOUT_BUDGET_MS = 15000; // the web client now waits up to 15 s for the payment (BUG-01 fix)
 const CATALOG_P95_BUDGET_MS = 200;
 
 async function call(method, path, body, cookie) {
