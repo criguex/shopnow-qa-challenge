@@ -14,7 +14,17 @@
     "test": "playwright test",
     "pretest": "node app/check-node.mjs",
     "test:ui": "playwright test --ui",
-    "postinstall": "playwright install chromium"
+    "postinstall": "playwright install chromium",
+    "test:api": "playwright test --grep @api",
+    "test:browser": "playwright test --grep @ui",
+    "test:p1": "playwright test --grep @P1",
+    "test:controls": "playwright test --grep-invert BUG-",
+    "report": "playwright show-report",
+    "typecheck": "tsc --noEmit",
+    "perf": "node perf/latency.mjs",
+    "evidence": "node evidence/record-evidence.mjs",
+    "traceability": "node scripts/traceability.mjs",
+    "docs:animation": "node docs/scenes/export.mjs"
   },
   "dependencies": {
     "express": "4.21.1",
