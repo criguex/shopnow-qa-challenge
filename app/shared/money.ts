@@ -4,7 +4,7 @@ export interface Coupon {
 }
 
 export function lineTotal(price: number, quantity: number): number {
-  return Math.floor(price * quantity * 100) / 100;
+  return (Math.round(price * 100) * quantity) / 100;
 }
 
 export function discountAmount(subtotal: number, percent: number): number {
