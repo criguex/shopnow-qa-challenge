@@ -5,7 +5,7 @@ import { useAuth } from "../auth";
 import { useCart } from "../cart";
 import { useRouter } from "../router";
 
-const PAYMENT_TIMEOUT_MS = 3000;
+const PAYMENT_TIMEOUT_MS = 15000;
 
 export function Checkout() {
   const { user, ready } = useAuth();
