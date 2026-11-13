@@ -23,8 +23,7 @@ function findCoupon(code: string): Coupon | null {
 function formatOrderDate(iso: string) {
   const date = new Date(iso);
   const time = new Intl.DateTimeFormat("en-GB", { timeZone: TIME_ZONE, hour: "2-digit", minute: "2-digit", hour12: false }).format(date);
-  const [year, month, day] = iso.slice(0, 10).split("-");
-  const displayDate = `${month}/${day}/${year}`;
+  const displayDate = new Intl.DateTimeFormat("en-US", { timeZone: TIME_ZONE, year: "numeric", month: "2-digit", day: "2-digit" }).format(date);
   return { displayDate, displayTime: time };
 }
 
