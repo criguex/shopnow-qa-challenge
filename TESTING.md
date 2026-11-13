@@ -1,24 +1,32 @@
 # Testing ShopNow — strategy, design and how to run it
 
-This file explains how the QA work in this repo is organised. The deliverables are `ANALYSIS.md`, `BUGS.md`, `tests/` and `ai/README.md`; this page is the map that ties them together. (`README.md` is the challenge statement and is left untouched.)
+This file explains how the QA work in this repo is organised. The deliverables are `ANALYSIS.md`, `BUGS.md`, `tests/` and `ai/README.md`; this page is the map that ties them together, and [`docs/TRACEABILITY.md`](docs/TRACEABILITY.md) links every requirement to its tests, bugs and evidence. (`README.md` is the challenge statement and is left untouched.)
 
 ## TL;DR
 
 | What | Result |
 |---|---|
 | Bugs reported | **15** (`BUG-01`…`BUG-15`): 5 Critical, 5 High, 3 Medium, 2 Low · 3 user reports + 12 found by me |
-| Playwright tests | **39**: 36 fail today, one or more per bug, with the bug ID in the name · 3 controls pass (golden path, login, the team's cart test) |
+| Playwright tests | **44** across 14 acceptance criteria: **36 fail today** (one or more per bug, bug ID in the name) · **8 controls pass** (catalog search/filter, login and access, golden-path checkout, the team's cart test) |
+| Proof the tests are right | branch **`fixes`**: one commit per bug in `app/` → the same 44 tests are **44/44 green** |
+| Traceability | every test has `case_key`, `ac`, `requirement`, `defect` + tags · generated matrix in `docs/TRACEABILITY.md` |
+| Evidence | `evidence/BUG-XX/`: numbered step screenshots, video with visible pointer and step banners (MP4 + GIF), failure boxed in red with expected vs actual, HTTP log, environment and links |
 | Techniques | risk-based priority · independent oracle · golden path + mutants · boundary values · state transitions · concurrency · UI + API |
-| Extra | latency probe with budgets (`perf/`) · CI pipeline (`.github/workflows/qa.yml`) · GIF evidence (`evidence/`) |
+| Extra | latency probe with budgets (`perf/`) · CI pipeline (`.github/workflows/qa.yml`) |
 
 ## How to run
 
 ```bash
 npm install
-npm test                      # full suite; starts the app if it isn't running
-npx playwright test -g "BUG-06"   # only one bug
-npx playwright show-report    # HTML report with traces of the failures
-node perf/latency.mjs         # latency budgets (app must be running)
+npm test                              # full suite; starts the app if it isn't running
+npx playwright test --grep @BUG-06    # one bug
+npx playwright test --grep @P1        # by priority (@P1 @P2 @P3)
+npx playwright test --grep @api       # by layer (@api @ui)
+npx playwright test --grep @AC-07     # by acceptance criterion
+npx playwright show-report            # HTML report with traces of the failures
+node perf/latency.mjs                 # latency budgets (app must be running)
+node evidence/record-evidence.mjs     # re-record the evidence of every bug (fresh app)
+git switch fixes && npm test          # same suite against the fixed app: all green
 ```
 
 **Red is the expected result today.** Every failing test names its bug, so the report reads like a bug list. When the team fixes a bug, its tests turn green and stay as regression tests. `zz-server-robustness.spec.ts` runs last on purpose: while BUG-03 is open it crashes the server, and anything after it would fail for the wrong reason.
@@ -34,6 +42,7 @@ flowchart LR
     C[coupons]
     S[stock]
     K[cart]
+    CA[catalog · access · login]
     Z[zz-server-robustness]:::crit
   end
   subgraph support["tests/support — reusable building blocks"]
@@ -41,9 +50,10 @@ flowchart LR
     PO[Page objects<br/>Catalog · Product · Cart · Checkout · Order]
     OR[oracle.ts<br/>expected values from SPEC]
     DATA[checkoutData.ts<br/>golden payload + mutants]
+    TR[trace.ts<br/>case_key · AC · requirement · defect · tags]
   end
   H[helpers.ts<br/>resetData · login]
-  specs --> API & PO & OR & DATA & H
+  specs --> API & PO & OR & DATA & TR & H
   API -->|HTTP /api| APP[(ShopNow<br/>localhost:4321)]
   PO -->|data-testid| APP
   classDef crit fill:#fde2e1,stroke:#c0392b;
@@ -109,16 +119,18 @@ A mutant changes **one** thing of a request that is known to work. If the system
 
 ### Coverage matrix (spec → tests)
 
+Summary by rule; the per-case version with acceptance criteria and results is [`docs/TRACEABILITY.md`](docs/TRACEABILITY.md).
+
 | SPEC rule | Test file | Bugs |
 |---|---|---|
-| Search and filter by category | explored manually (works) | — |
+| Search and filter by category | `catalog.spec.ts` (passes) | — |
 | Can't buy more than the stock | `stock.spec.ts` | BUG-07, BUG-12 |
 | Cart totals, quantities (min 1) | `cart.spec.ts`, `checkout-validation.spec.ts` | BUG-04, BUG-10 |
 | Cart persists after closing the browser | `cart.spec.ts` | BUG-08 |
 | One coupon per purchase | `coupons.spec.ts` | BUG-05, BUG-11, BUG-15 |
 | Coupons are case-insensitive | `coupons.spec.ts` | BUG-06 |
 | Discount = % of subtotal | `coupons.spec.ts` (oracle) | BUG-06 |
-| Login required before paying | explored (works) + `[EXAMPLE]` test | — |
+| Login required before paying | `access.spec.ts`, `login.spec.ts` (pass) | — |
 | Shipping details + card, payment, order | `payments.spec.ts`, `checkout-validation.spec.ts`, `zz-server-robustness.spec.ts` | BUG-01, BUG-03, BUG-09, BUG-14 |
 | Two decimals | `cart.spec.ts` | BUG-10 |
 | My orders / detail (own orders) | `orders.spec.ts` | BUG-02 |
@@ -170,19 +182,57 @@ flowchart LR
 
 `.github/workflows/qa.yml` runs both jobs on every push. It is red today on purpose: it is the regression gate the team needs once the fixes land.
 
+## Traceability
+
+```mermaid
+flowchart LR
+  R["SPEC.md / docs/API.md<br/>requirement"] --> AC["AC-01…AC-14<br/>acceptance criteria"]
+  AC --> TC["case_key<br/>CART-02, CPN-05…"]
+  TC --> T["Playwright test<br/>[BUG-xx] title + tags"]
+  T --> B["BUGS.md<br/>BUG-xx"]
+  B --> E["evidence/BUG-xx/<br/>steps · video · HTTP log"]
+  B --> F["branch fixes<br/>fix(BUG-xx) commit"]
+  F -->|same test turns green| T
+```
+
+- **In the code:** `tests/support/trace.ts` defines the 14 acceptance criteria and gives each test its `case_key`, `ac`, `requirement` and `defect` annotations plus tags (`@ui/@api`, `@P1…@P3`, `@AC-xx`, `@BUG-xx`, the case key). Annotations show up in the HTML report.
+- **Matrix:** [`docs/TRACEABILITY.md`](docs/TRACEABILITY.md) is generated by `scripts/traceability.mjs` from the Playwright JSON reports of `main` and `fixes`: AC coverage, and per case its requirement, bug, evidence link and result on each branch.
+- **In the reports:** every entry in `BUGS.md` lists its evidence folder, the resource URL, the test cases, the acceptance criteria and the fix commit.
+- **In git:** one commit per step on `main`; one `fix(BUG-xx)` commit per bug on `fixes`.
+
 ## Evidence
 
-| Bug | GIF |
-|---|---|
-| BUG-01 payment "failed" but charged | ![BUG-01](evidence/BUG-01.gif) |
-| BUG-02 Ana reads Bruno's order | ![BUG-02](evidence/BUG-02.gif) |
-| BUG-06 lowercase coupon = 0% | ![BUG-06](evidence/BUG-06.gif) |
-| BUG-08 catalog Add lost on reload | ![BUG-08](evidence/BUG-08.gif) |
-| BUG-11 second coupon after reload | ![BUG-11](evidence/BUG-11.gif) |
-| BUG-12 cart above stock | ![BUG-12](evidence/BUG-12.gif) |
-| BUG-13 late-night order date | ![BUG-13](evidence/BUG-13.gif) |
+Each bug has its own folder `evidence/BUG-XX/` with a `README.md` that works as the defect's evidence sheet:
 
-The GIFs are the real Playwright tests recorded in slow motion; the last frame of each is the wrong state the test catches.
+- environment (app version, browser, time zone, data, users, recording time) and a link to the resource;
+- expected vs actual, where **actual is read live from the app** while recording;
+- for UI bugs: numbered step screenshots (`BUG-XX-01.png`, `-02`…), a video with a visible pointer, a banner describing each step and the failure boxed in red with expected vs actual (MP4 + GIF);
+- the HTTP log of every `/api` call (method, path, status code, request and response bodies);
+- for BUG-03, the server log of the crash.
+
+`evidence/record-evidence.mjs` regenerates all of it from a fresh app, so the evidence is reproducible, not hand-made.
+
+| Bug | Video |
+|---|---|
+| [BUG-01](evidence/BUG-01/README.md) payment "failed" but charged | ![BUG-01](evidence/BUG-01/BUG-01.gif) |
+| [BUG-02](evidence/BUG-02/README.md) Ana reads Bruno's order | ![BUG-02](evidence/BUG-02/BUG-02.gif) |
+| [BUG-06](evidence/BUG-06/README.md) lowercase coupon = 0% | ![BUG-06](evidence/BUG-06/BUG-06.gif) |
+| [BUG-08](evidence/BUG-08/README.md) catalog Add lost on reload | ![BUG-08](evidence/BUG-08/BUG-08.gif) |
+| [BUG-09](evidence/BUG-09/README.md) "Ana García" can't pay | ![BUG-09](evidence/BUG-09/BUG-09.gif) |
+| [BUG-10](evidence/BUG-10/README.md) 3 × $8.35 = $25.04 | ![BUG-10](evidence/BUG-10/BUG-10.gif) |
+| [BUG-11](evidence/BUG-11/README.md) second coupon after reload | ![BUG-11](evidence/BUG-11/BUG-11.gif) |
+| [BUG-12](evidence/BUG-12/README.md) cart above stock | ![BUG-12](evidence/BUG-12/BUG-12.gif) |
+| [BUG-13](evidence/BUG-13/README.md) late-night order date | ![BUG-13](evidence/BUG-13/BUG-13.gif) |
+
+API bugs (BUG-03, 04, 05, 07, 14, 15) have the HTTP log in their folders; BUG-04, 05 and 07 also show what the customer then sees (a -$28.70 "approved" payment, an order with a negative total, "Available stock: -1", a blank My payments page), and BUG-03 includes the server log of the crash.
+
+## Fix branch
+
+The optional extension is on branch **`fixes`**, kept apart so `main` keeps showing the bugs:
+
+- one commit per bug, `fix(BUG-xx): …`, touching only `app/` (plus the latency budget, which follows the new client timeout);
+- the same 44 tests: **36 red on `main` → 44/44 green on `fixes`** (see the matrix);
+- the fixes are minimal and point at the root cause written in `BUGS.md`; they are a proof for the tests, not a refactor.
 
 ## Environment notes
 
