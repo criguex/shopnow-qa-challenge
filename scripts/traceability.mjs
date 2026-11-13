@@ -23,7 +23,7 @@ function collect(file) {
       for (const t of spec.tests) {
         const meta = Object.fromEntries((t.annotations ?? []).map((a) => [a.type, a.description]));
         const status = t.results.at(-1)?.status ?? "not run";
-        rows.set(meta.case_key ?? spec.title, { title: spec.title, file: `${spec.file}:${spec.line}`, tags: spec.tags ?? [], meta, status });
+        rows.set(meta.case_key ?? spec.title, { title: spec.title, file: `${spec.file}:${spec.line}`, tags: (spec.tags ?? []).map((t) => t.replace(/^@?/, "@")), meta, status });
       }
     }
     (suite.suites ?? []).forEach(walk);
