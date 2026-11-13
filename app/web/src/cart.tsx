@@ -24,9 +24,9 @@ function writeStoredCart(cart: StoredCart) {
 export function mergeItem(items: CartItem[], product: Product, quantity: number): CartItem[] {
   const existing = items.find((i) => i.productId === product.id);
   if (existing) {
-    return items.map((i) => (i.productId === product.id ? { ...i, quantity: i.quantity + quantity, stock: product.stock } : i));
+    return items.map((i) => (i.productId === product.id ? { ...i, quantity: Math.min(i.quantity + quantity, product.stock), stock: product.stock } : i));
   }
-  return [...items, { productId: product.id, name: product.name, price: product.price, stock: product.stock, quantity }];
+  return [...items, { productId: product.id, name: product.name, price: product.price, stock: product.stock, quantity: Math.min(quantity, product.stock) }];
 }
 
 interface CartContextValue {
