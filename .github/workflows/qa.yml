@@ -1,0 +1,46 @@
+name: QA
+
+# Red is expected while the bugs in BUGS.md are open: every failing test name carries its bug ID.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Playwright suite (UI + API)
+        run: npm test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 14
+
+  performance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Start the app
+        run: |
+          npm run dev > app.log 2>&1 &
+          for i in $(seq 1 60); do curl -sf http://localhost:4321/api/products > /dev/null && exit 0; sleep 1; done
+          cat app.log; exit 1
+      - name: Latency budgets
+        run: node perf/latency.mjs
