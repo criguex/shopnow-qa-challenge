@@ -1,0 +1,20 @@
+# Server output while reproducing BUG-03 (app/ as delivered, npx tsx app/server/index.ts)
+# Request: POST /api/checkout with "shipping": { "name": 123, ... } as Ana
+ShopNow running at http://localhost:4322
+./app/server/api.ts:145
+  if (!shipping?.name?.trim() || !shipping?.address?.trim()) {
+                       ^
+
+TypeError: shipping?.name?.trim is not a function
+    at <anonymous> (./app/server/api.ts:145:24)
+    at Layer.handle [as handle_request] (./node_modules/express/lib/router/layer.js:95:5)
+    at next (./node_modules/express/lib/router/route.js:149:13)
+    at requireUser (./app/server/api.ts:49:3)
+    at Layer.handle [as handle_request] (./node_modules/express/lib/router/layer.js:95:5)
+    at next (./node_modules/express/lib/router/route.js:149:13)
+    at Route.dispatch (./node_modules/express/lib/router/route.js:119:3)
+    at Layer.handle [as handle_request] (./node_modules/express/lib/router/layer.js:95:5)
+    at ./node_modules/express/lib/router/index.js:284:15
+    at router.process_params (./node_modules/express/lib/router/index.js:346:12)
+
+Node.js v26.5.0

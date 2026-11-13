@@ -1,6 +1,6 @@
 # BUG-03 — One malformed checkout request takes the whole store down
 
-- **Environment:** ShopNow local (`npm run dev`) · app version: commit `40bc732` · Chromium (Playwright 1.48.2) · timezone America/Argentina/Buenos_Aires · fresh data (`POST /api/test/reset`) · users ana@shopnow.test / bruno@shopnow.test · recorded 2026-11-13 15:38 UTC on http://localhost:4322 (port 4321 was in use on the recording machine; same app and data)
+- **Environment:** ShopNow local (`npm run dev`) · app version: commit `40bc732` · Chromium (Playwright 1.48.2) · timezone America/Argentina/Buenos_Aires · fresh data (`POST /api/test/reset`) · users ana@shopnow.test / bruno@shopnow.test · recorded 2026-11-13 15:46 UTC on http://localhost:4322 (port 4321 was in use on the recording machine; same app and data)
 - **Resource:** [http://localhost:4321/api/checkout](http://localhost:4321/api/checkout)
 - **Acceptance criteria:** AC-14 (see docs/TRACEABILITY.md) · **Report:** [BUGS.md](../../BUGS.md) › BUG-03
 - **Automated test:** `tests/zz-server-robustness.spec.ts (ROB-01, ROB-02)`
@@ -9,6 +9,7 @@
 
 - **Expected:** 400 invalid data, and GET /api/products keeps answering 200
 - **Actual:** checkout answered "socket hang up"; the next GET /api/products answered ERR (server process exited)
+- **Logs:** Server output of the crash: [server.log](server.log) (`TypeError: shipping?.name?.trim is not a function`, then the Node process exits and every page and API call gets connection refused).
 
 ## HTTP log
 

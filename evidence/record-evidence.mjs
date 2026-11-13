@@ -7,7 +7,7 @@
 // BUG-03 crashes the server on purpose and is always recorded last; restart the app afterwards.
 
 import { execSync } from "node:child_process";
-import { mkdirSync, renameSync, rmSync, writeFileSync, readdirSync } from "node:fs";
+import { existsSync, mkdirSync, renameSync, rmSync, writeFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium, request as apiRequest } from "@playwright/test";
@@ -302,8 +302,9 @@ const BUGS = {
 const API_BUGS = {
   "BUG-03": {
     title: "One malformed checkout request takes the whole store down", ac: "AC-14", test: "tests/zz-server-robustness.spec.ts (ROB-01, ROB-02)", resource: "/api/checkout",
+    notes: "Server output of the crash: [server.log](server.log) (`TypeError: shipping?.name?.trim is not a function`, then the Node process exits and every page and API call gets connection refused).",
     expected: "400 invalid data, and GET /api/products keeps answering 200",
-    async run(ctx, log) {
+    async run(ctx, log, show) {
       await apiCall(ctx, log, "POST", "/api/login", ANA);
       await apiCall(ctx, log, "GET", "/api/products");
       await apiCall(ctx, log, "POST", "/api/checkout", { items: [{ productId: 3, quantity: 1 }], coupons: [], shipping: { name: 123, address: "1234 Corrientes Ave" }, card: { number: CARD } });
@@ -314,34 +315,42 @@ const API_BUGS = {
   "BUG-04": {
     title: "Checkout accepts zero, negative, decimal and non-numeric quantities", ac: "AC-05, AC-14", test: "tests/checkout-validation.spec.ts (CHK-02…CHK-06)", resource: "/api/checkout",
     expected: "400 for every mutant; no order, no payment, T-shirt stock stays 40",
-    async run(ctx, log) {
+    async run(ctx, log, show) {
       await apiCall(ctx, log, "POST", "/api/login", ANA);
-      for (const quantity of [0, -2, 1.5, "abc"]) {
+      for (const quantity of [0, -2, 1.5]) {
         await apiCall(ctx, log, "POST", "/api/checkout", { items: [{ productId: 3, quantity }], coupons: [], shipping: SHIPPING, card: { number: CARD } });
       }
+      await show("/payments", "Ana opens My payments after quantities 0, -2 and 1.5", (p) => p.getByTestId("payment-row-5"),
+        "no payment for an invalid quantity", async (p) => `approved payment ${(await p.getByTestId("payment-row-5").innerText()).replace(/\s+/g, " ")}`);
+      await apiCall(ctx, log, "POST", "/api/checkout", { items: [{ productId: 3, quantity: "abc" }], coupons: [], shipping: SHIPPING, card: { number: CARD } });
       const stock = JSON.parse((await apiCall(ctx, log, "GET", "/api/products/3")).body).stock;
-      await apiCall(ctx, log, "GET", "/api/payments");
-      return `201 for all 4 mutants; -2 created an approved payment of -28.70; T-shirt stock is now ${stock}`;
+      await show("/payments", "Ana opens My payments after quantity \"abc\"", null,
+        "My payments lists Ana's payments", async () => "blank page: the order stored total null and the page crashes (TypeError: Cannot read properties of null (reading 'toLocaleString')); My orders too");
+      return `201 for all 4 mutants; -2 created an approved payment of -28.70; "abc" stored an order with total null that blanks My payments and My orders; T-shirt stock is now ${stock}`;
     },
   },
   "BUG-05": {
     title: "The API accepts several coupons per purchase (even a negative total)", ac: "AC-07, AC-14", test: "tests/coupons.spec.ts (CPN-06…CPN-08)", resource: "/api/checkout",
     expected: "400 Only one coupon can be used per purchase; no order",
-    async run(ctx, log) {
+    async run(ctx, log, show) {
       await apiCall(ctx, log, "POST", "/api/login", ANA);
       await apiCall(ctx, log, "POST", "/api/checkout", { items: [{ productId: 3, quantity: 2 }], coupons: ["FLOCK10", "BIENVENIDA15"], shipping: SHIPPING, card: { number: CARD } });
       const r = await apiCall(ctx, log, "POST", "/api/checkout", { items: [{ productId: 3, quantity: 1 }], coupons: Array(11).fill("FLOCK10"), shipping: SHIPPING, card: { number: CARD } });
+      await show("/orders", "Ana opens My orders", (p) => p.getByTestId("order-row-5"),
+        "no order with stacked coupons", async (p) => `order ${(await p.getByTestId("order-row-5").innerText()).replace(/\s+/g, " ")} (negative total)`);
       return `201 with 25% off for two coupons; 201 with total ${JSON.parse(r.body).total} for 11 × FLOCK10`;
     },
   },
   "BUG-07": {
     title: "Checkout never checks stock: overselling and negative stock", ac: "AC-03, AC-14", test: "tests/stock.spec.ts (STK-01, STK-02)", resource: "/api/checkout",
     expected: "409 out of stock; chair stock stays 2",
-    async run(ctx, log) {
+    async run(ctx, log, show) {
       await apiCall(ctx, log, "POST", "/api/login", ANA);
       await apiCall(ctx, log, "GET", "/api/products/8");
       await apiCall(ctx, log, "POST", "/api/checkout", { items: [{ productId: 8, quantity: 3 }], coupons: [], shipping: SHIPPING, card: { number: CARD } });
       const stock = JSON.parse((await apiCall(ctx, log, "GET", "/api/products/8")).body).stock;
+      await show("/product/8", "Open the Ergonomic chair page", (p) => p.getByTestId("product-stock"),
+        "Available stock: 2 (the purchase of 3 is refused)", async (p) => `"${await p.getByTestId("product-stock").innerText()}"`);
       return `201 for 3 chairs with stock 2; chair stock is now ${stock}`;
     },
   },
@@ -385,9 +394,10 @@ function writeReport(id, bug, { steps = [], http = [], expected, actual, video }
     "",
     `- **Expected:** ${expected}`,
     `- **Actual:** ${actual}`,
+    ...(bug.notes ? [`- **Logs:** ${bug.notes}`] : []),
     "",
     ...(video ? ["## Video", "", `![${id}](${id}.gif)`, "", `Full quality: [${id}.mp4](${id}.mp4) (pointer visible, step banners, failure marked in red).`, ""] : []),
-    ...(steps.length ? ["## Steps", "", ...steps.map((s) => `### Step ${s.n} — ${s.text}\n\n![${id} step ${s.n}](${s.file})\n`)] : []),
+    ...(steps.length ? [video ? "## Steps" : "## What the user sees", "", ...steps.map((s) => `### Step ${s.n} — ${s.text}\n\n![${id} step ${s.n}](${s.file})\n`)] : []),
     "## HTTP log",
     "",
     httpTable(http),
@@ -420,18 +430,40 @@ async function recordUi(browser, id) {
   console.log(`${id}: ${r.steps.length} screenshots, video, ${r.http.length} HTTP calls`);
 }
 
-async function recordApi(id) {
+async function recordApi(browser, id) {
   const bug = API_BUGS[id];
   const dir = join(ROOT, id);
-  rmSync(dir, { recursive: true, force: true });
+  for (const f of existsSync(dir) ? readdirSync(dir) : []) if (f !== "server.log") rmSync(join(dir, f));
   mkdirSync(dir, { recursive: true });
   const ctx = await apiRequest.newContext();
   await ctx.post(`${BASE_URL}/api/test/reset`);
   const log = [];
-  const actual = await bug.run(ctx, log);
+  let context, page, r;
+  const show = async (path, label, target, expected, actual) => {
+    if (!context) {
+      context = await browser.newContext({ viewport: VIEWPORT, locale: "en-US", timezoneId: "America/Argentina/Buenos_Aires", storageState: await ctx.storageState() });
+      await context.addInitScript(OVERLAY_INIT);
+      page = await context.newPage();
+      r = new Recorder({ id, ...bug }, page, dir);
+    }
+    try {
+      await page.goto(`${BASE_URL}${path}`);
+      if (target) await target(page).waitFor({ timeout: 5_000 });
+      else await page.waitForTimeout(1200);
+      await r.step(label);
+      await r.fail(target ? target(page) : page.locator("body"), expected, await actual(page));
+    } catch {
+      r.n += 1;
+      const file = `${id}-${String(r.n).padStart(2, "0")}.png`;
+      await page.screenshot({ path: join(dir, file) }).catch(() => {});
+      r.steps.push({ n: r.n, text: `${label}. Expected: ${expected}. Actual: ${await actual(page)}`, file });
+    }
+  };
+  const actual = await bug.run(ctx, log, show);
+  if (context) await context.close();
   await ctx.dispose();
-  writeReport(id, bug, { http: log, expected: bug.expected, actual });
-  console.log(`${id}: ${log.length} HTTP calls`);
+  writeReport(id, bug, { steps: r?.steps ?? [], http: log, expected: bug.expected, actual });
+  console.log(`${id}: ${r?.steps.length ?? 0} screenshots, ${log.length} HTTP calls`);
 }
 
 const wanted = process.argv.slice(2);
@@ -440,7 +472,7 @@ const selected = (wanted.length ? wanted : all).sort((a, b) => (a === "BUG-03") 
 const browser = await chromium.launch({ slowMo: 120 });
 for (const id of selected) {
   if (BUGS[id]) await recordUi(browser, id);
-  else if (API_BUGS[id]) await recordApi(id);
+  else if (API_BUGS[id]) await recordApi(browser, id);
 }
 await browser.close();
 console.log("Evidence folders:", readdirSync(ROOT).filter((f) => f.startsWith("BUG-")).join(" "));
