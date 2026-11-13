@@ -3,6 +3,7 @@ import { login, resetData, USERS } from "./helpers";
 import { argentinaDate, argentinaTime } from "./support/oracle";
 import { OrderPage } from "./support/pages";
 import { ShopApi } from "./support/shopApi";
+import { trace } from "./support/trace";
 
 // Seed data: order 2 belongs to Ana and was placed at 2026-10-15T02:30Z (= Oct 14, 23:30 in Argentina).
 // Order 3 belongs to Bruno.
@@ -13,7 +14,7 @@ test.beforeEach(async ({ request }) => {
   await resetData(request);
 });
 
-test("[BUG-02] the API does not return another customer's order", async ({ request }) => {
+test("[BUG-02] the API does not return another customer's order", trace({ caseKey: "ORD-01", ac: ["AC-12"], requirement: "SPEC › My orders: a logged-in user can see their orders", defect: "BUG-02", layer: "api", priority: "P1" }), async ({ request }) => {
   const ana = new ShopApi(request);
   await ana.login(USERS.ana);
 
@@ -25,7 +26,7 @@ test("[BUG-02] the API does not return another customer's order", async ({ reque
   expect(body).not.toContain("Evergreen");
 });
 
-test("[BUG-02] a customer cannot open another customer's order page", async ({ page }) => {
+test("[BUG-02] a customer cannot open another customer's order page", trace({ caseKey: "ORD-02", ac: ["AC-12"], requirement: "SPEC › My orders: a logged-in user can see their orders", defect: "BUG-02", layer: "ui", priority: "P1" }), async ({ page }) => {
   await login(page, USERS.ana);
   const order = new OrderPage(page);
 
@@ -36,7 +37,7 @@ test("[BUG-02] a customer cannot open another customer's order page", async ({ p
   await expect(page.getByText("Bruno Diaz")).toHaveCount(0);
 });
 
-test("[BUG-13] the API shows the order date in Argentina time for a late-night order", async ({ request }) => {
+test("[BUG-13] the API shows the order date in Argentina time for a late-night order", trace({ caseKey: "ORD-03", ac: ["AC-13"], requirement: "SPEC › My orders: dates and times in Argentina time", defect: "BUG-13", layer: "api", priority: "P2" }), async ({ request }) => {
   const ana = new ShopApi(request);
   await ana.login(USERS.ana);
 
@@ -49,7 +50,7 @@ test("[BUG-13] the API shows the order date in Argentina time for a late-night o
   expect(order.displayDate).toBe("10/14/2026");
 });
 
-test("[BUG-13] My orders and the order detail show the Argentina date for a late-night order", async ({ page }) => {
+test("[BUG-13] My orders and the order detail show the Argentina date for a late-night order", trace({ caseKey: "ORD-04", ac: ["AC-13"], requirement: "SPEC › My orders: dates and times in Argentina time", defect: "BUG-13", layer: "ui", priority: "P2" }), async ({ page }) => {
   await login(page, USERS.ana);
 
   await page.getByTestId("nav-orders").click();

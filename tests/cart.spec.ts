@@ -4,6 +4,7 @@ import { CATALOG, expectedLineTotal, expectedTotals, money } from "./support/ora
 import { CartPage, CatalogPage, ProductPage } from "./support/pages";
 import { ShopApi } from "./support/shopApi";
 import { goldenCheckout } from "./support/checkoutData";
+import { trace } from "./support/trace";
 
 const { mug, backpack } = CATALOG;
 
@@ -12,7 +13,7 @@ test.beforeEach(async ({ request }) => {
 });
 
 // The team's original test only checked that the total was visible. It now checks the value.
-test("the cart total is calculated correctly", async ({ page }) => {
+test("the cart total is calculated correctly", trace({ caseKey: "CART-01", ac: ["AC-04"], requirement: "SPEC › Cart: total per product and order total", layer: "ui", priority: "P2" }), async ({ page }) => {
   await page.goto("/product/1");
   await page.getByTestId("quantity-select").selectOption("2");
   await page.getByTestId("add-to-cart").click();
@@ -22,7 +23,7 @@ test("the cart total is calculated correctly", async ({ page }) => {
   await expect(page.getByTestId("cart-total")).toHaveText(money(expectedTotals([{ price: mug.price, quantity: 2 }]).total));
 });
 
-test("[BUG-08] a product added with the catalog Add button is still in the cart after reloading", async ({ page }) => {
+test("[BUG-08] a product added with the catalog Add button is still in the cart after reloading", trace({ caseKey: "CART-02", ac: ["AC-06", "AC-02"], requirement: "SPEC › Cart: the cart persists even if the user closes the browser", defect: "BUG-08", layer: "ui", priority: "P2" }), async ({ page }) => {
   const catalog = new CatalogPage(page);
   await catalog.open();
   await catalog.quickAdd(mug.id);
@@ -36,7 +37,7 @@ test("[BUG-08] a product added with the catalog Add button is still in the cart 
   await expect(cart.total()).toHaveText(money(mug.price));
 });
 
-test("[BUG-08] catalog and product-page additions both survive a reload", async ({ page }) => {
+test("[BUG-08] catalog and product-page additions both survive a reload", trace({ caseKey: "CART-03", ac: ["AC-06", "AC-02"], requirement: "SPEC › Cart: the cart persists even if the user closes the browser", defect: "BUG-08", layer: "ui", priority: "P2" }), async ({ page }) => {
   await new ProductPage(page).open(CATALOG.headphones.id);
   await new ProductPage(page).add(1);
   const catalog = new CatalogPage(page);
@@ -59,10 +60,10 @@ test.describe("line totals are exact to the cent", () => {
     { product: backpack, quantity: 3 },
   ];
 
-  for (const { product, quantity } of cases) {
+  for (const [index, { product, quantity }] of cases.entries()) {
     const expected = expectedLineTotal(product.price, quantity);
 
-    test(`[BUG-10] cart shows ${quantity} × ${money(product.price)} = ${money(expected)}`, async ({ page }) => {
+    test(`[BUG-10] cart shows ${quantity} × ${money(product.price)} = ${money(expected)}`, trace({ caseKey: `CART-0${4 + index}`, ac: ["AC-04"], requirement: "SPEC › Checkout: totals in dollars with two decimals", defect: "BUG-10", layer: "ui", priority: "P2" }), async ({ page }) => {
       await new ProductPage(page).open(product.id);
       await new ProductPage(page).add(quantity);
       const cart = new CartPage(page);
@@ -73,7 +74,7 @@ test.describe("line totals are exact to the cent", () => {
     });
   }
 
-  test("[BUG-10] the order and the payment charge 3 × $8.35 = $25.05", async ({ request }) => {
+  test("[BUG-10] the order and the payment charge 3 × $8.35 = $25.05", trace({ caseKey: "CART-07", ac: ["AC-04"], requirement: "SPEC › Checkout: totals in dollars with two decimals", defect: "BUG-10", layer: "api", priority: "P2" }), async ({ request }) => {
     const api = new ShopApi(request);
     await api.login();
 

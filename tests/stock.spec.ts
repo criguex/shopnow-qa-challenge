@@ -4,6 +4,7 @@ import { CATALOG, expectedLineTotal, money } from "./support/oracle";
 import { CartPage, ProductPage } from "./support/pages";
 import { ShopApi } from "./support/shopApi";
 import { goldenCheckout } from "./support/checkoutData";
+import { trace } from "./support/trace";
 
 const { chair } = CATALOG;
 
@@ -11,7 +12,7 @@ test.beforeEach(async ({ request }) => {
   await resetData(request);
 });
 
-test("[BUG-07] checkout rejects a quantity above the available stock with 409 and keeps the stock", async ({ request }) => {
+test("[BUG-07] checkout rejects a quantity above the available stock with 409 and keeps the stock", trace({ caseKey: "STK-01", ac: ["AC-03", "AC-14"], requirement: "SPEC › Catalog: users can't buy more than the available stock; docs/API.md › 409", defect: "BUG-07", layer: "api", priority: "P1" }), async ({ request }) => {
   const api = new ShopApi(request);
   await api.login();
   const ordersBefore = await api.orders();
@@ -23,7 +24,7 @@ test("[BUG-07] checkout rejects a quantity above the available stock with 409 an
   expect(await api.orders()).toHaveLength(ordersBefore.length);
 });
 
-test("[BUG-07] three customers buying the last two units at once: only two succeed and stock never goes negative", async ({ baseURL }) => {
+test("[BUG-07] three customers buying the last two units at once: only two succeed and stock never goes negative", trace({ caseKey: "STK-02", ac: ["AC-03"], requirement: "SPEC › Catalog: users can't buy more than the available stock", defect: "BUG-07", layer: "api", priority: "P1" }), async ({ baseURL }) => {
   const contexts = await Promise.all([1, 2, 3].map(() => playwrightRequest.newContext({ baseURL })));
   const buyers = contexts.map((ctx) => new ShopApi(ctx));
   await buyers[0].login(USERS.ana);
@@ -40,7 +41,7 @@ test("[BUG-07] three customers buying the last two units at once: only two succe
   await Promise.all(contexts.map((ctx) => ctx.dispose()));
 });
 
-test("[BUG-12] adding the same product twice from its page cannot exceed the available stock", async ({ page }) => {
+test("[BUG-12] adding the same product twice from its page cannot exceed the available stock", trace({ caseKey: "STK-03", ac: ["AC-03"], requirement: "SPEC › Catalog: users can't buy more than the available stock", defect: "BUG-12", layer: "ui", priority: "P2" }), async ({ page }) => {
   const product = new ProductPage(page);
   await product.open(chair.id);
   await product.add(chair.stock);
