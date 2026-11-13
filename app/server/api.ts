@@ -199,6 +199,16 @@ api.post("/checkout", requireUser, async (req, res) => {
     appliedCoupons.push(coupon);
   }
 
+  const outOfStock = (products: { id: number; stock: number }[]) =>
+    lines.some((line) => {
+      const requested = lines.filter((l) => l.productId === line.productId).reduce((sum, l) => sum + l.quantity, 0);
+      return requested > (products.find((p) => p.id === line.productId)?.stock ?? 0);
+    });
+  if (outOfStock(data.products)) {
+    res.status(409).json({ error: "Some products are out of stock." });
+    return;
+  }
+
   const totals = cartTotals(lines, appliedCoupons);
 
   await sleep(totals.total > 100 ? 4000 : 700);
@@ -209,6 +219,10 @@ api.post("/checkout", requireUser, async (req, res) => {
   }
 
   const fresh = load();
+  if (outOfStock(fresh.products)) {
+    res.status(409).json({ error: "Some products are out of stock." });
+    return;
+  }
   const now = new Date().toISOString();
   const orderId = nextId(fresh.orders);
   const paymentId = nextId(fresh.payments);
