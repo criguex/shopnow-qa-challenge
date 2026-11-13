@@ -153,7 +153,7 @@ api.post("/checkout", requireUser, async (req, res) => {
     res.status(400).json({ error: "Please fill in the shipping details." });
     return;
   }
-  const SAFE_TEXT = /^[A-Za-z0-9 .,#/-]+$/;
+  const SAFE_TEXT = /^[\p{L}\p{M}0-9 .,#/°º'’-]+$/u;
   if (!SAFE_TEXT.test(shipping.name.trim()) || !SAFE_TEXT.test(shipping.address.trim())) {
     res.status(400).json({ error: "Please fill in the shipping details." });
     return;
