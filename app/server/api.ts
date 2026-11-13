@@ -185,6 +185,10 @@ api.post("/checkout", requireUser, async (req, res) => {
     return;
   }
   const codes: string[] = Array.isArray(coupons) ? coupons.map(String) : [];
+  if (codes.length > 1) {
+    res.status(400).json({ error: "Only one coupon can be used per purchase." });
+    return;
+  }
   const appliedCoupons: Coupon[] = [];
   for (const code of codes) {
     const coupon = findCoupon(code);
