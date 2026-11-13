@@ -120,7 +120,7 @@ api.get("/orders", requireUser, (_req, res) => {
 
 api.get("/orders/:id", requireUser, (req, res) => {
   const user = res.locals.user as User;
-  const order = load().orders.find((o) => o.id === Number(req.params.id));
+  const order = load().orders.find((o) => o.id === Number(req.params.id) && o.userId === user.id);
   if (!order) {
     res.status(404).json({ error: "Order not found." });
     return;
