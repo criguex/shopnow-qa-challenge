@@ -172,7 +172,11 @@ api.post("/checkout", requireUser, async (req, res) => {
       res.status(400).json({ error: "One of the products no longer exists." });
       return;
     }
-    const quantity = Number(item.quantity);
+    const quantity = item.quantity;
+    if (typeof quantity !== "number" || !Number.isInteger(quantity) || quantity < 1) {
+      res.status(400).json({ error: "Quantities must be whole numbers of at least 1." });
+      return;
+    }
     lines.push({ productId: product.id, name: product.name, price: product.price, quantity });
   }
 
