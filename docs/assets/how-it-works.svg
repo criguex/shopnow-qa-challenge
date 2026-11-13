@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="470" viewBox="0 0 1280 470">
+<defs>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#55DFBD"/></marker>
+<marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#FB8176"/></marker>
+<clipPath id="c"><rect width="1280" height="470" rx="20"/></clipPath>
+</defs>
+<g clip-path="url(#c)"><rect width="1280" height="470" fill="#071B2B"/></g>
+<g font-family="-apple-system,Segoe UI,Helvetica,Arial,sans-serif">
+<text x="40" y="44" font-family="Menlo,Consolas,monospace" font-size="14" fill="#8FA6B0" letter-spacing="2">HOW THE WORK FLOWS · FROM THE SPEC TO A GREEN REGRESSION SUITE</text>
+
+<!-- inputs -->
+<rect x="40" y="76" width="190" height="190" rx="14" fill="#0D2638" stroke="#214456"/>
+<text x="60" y="106" font-size="16" font-weight="bold" fill="#F4F7F5">Inputs</text>
+<text x="60" y="136" font-family="Menlo,Consolas,monospace" font-size="13" fill="#ABC0C8">SPEC.md</text>
+<text x="60" y="160" font-family="Menlo,Consolas,monospace" font-size="13" fill="#ABC0C8">USER_REPORTS.md</text>
+<text x="60" y="184" font-family="Menlo,Consolas,monospace" font-size="13" fill="#ABC0C8">docs/API.md</text>
+<text x="60" y="208" font-family="Menlo,Consolas,monospace" font-size="13" fill="#ABC0C8">seed data · app/</text>
+<text x="60" y="244" font-size="12" fill="#8FA6B0">read first, nothing assumed</text>
+
+<!-- 1 analyze -->
+<rect x="270" y="76" width="200" height="86" rx="14" fill="#0D2638" stroke="#55DFBD" stroke-opacity=".5"/>
+<text x="290" y="104" font-size="15" font-weight="bold" fill="#55DFBD">1 · Analyze</text>
+<text x="290" y="128" font-size="13" fill="#ABC0C8">14 PO questions · gaps</text>
+<text x="290" y="148" font-family="Menlo,Consolas,monospace" font-size="12" fill="#8FA6B0">→ ANALYSIS.md</text>
+
+<!-- 2 hunt -->
+<rect x="270" y="180" width="200" height="86" rx="14" fill="#0D2638" stroke="#55DFBD" stroke-opacity=".5"/>
+<text x="290" y="208" font-size="15" font-weight="bold" fill="#55DFBD">2 · Hunt</text>
+<text x="290" y="232" font-size="13" fill="#ABC0C8">UI + API · mutants · limits</text>
+<text x="290" y="252" font-size="13" fill="#ABC0C8">concurrency · ~70 probes</text>
+
+<!-- 3 report -->
+<rect x="510" y="76" width="220" height="190" rx="14" fill="#2A1618" stroke="#FB8176" stroke-opacity=".6"/>
+<text x="530" y="106" font-size="15" font-weight="bold" fill="#FB8176">3 · Report</text>
+<text x="530" y="134" font-family="Menlo,Consolas,monospace" font-size="13" fill="#F4F7F5">BUGS.md · 15 bugs</text>
+<text x="530" y="160" font-size="13" fill="#ABC0C8">5 critical · 5 high</text>
+<text x="530" y="182" font-size="13" fill="#ABC0C8">3 medium · 2 low</text>
+<text x="530" y="208" font-size="13" fill="#ABC0C8">steps · expected vs actual</text>
+<text x="530" y="230" font-size="13" fill="#ABC0C8">root cause · priority</text>
+<text x="530" y="252" font-family="Menlo,Consolas,monospace" font-size="12" fill="#FB8176">evidence/BUG-XX/</text>
+
+<!-- 4 automate -->
+<rect x="770" y="76" width="230" height="190" rx="14" fill="#0D2638" stroke="#55DFBD" stroke-opacity=".5"/>
+<text x="790" y="106" font-size="15" font-weight="bold" fill="#55DFBD">4 · Automate</text>
+<text x="790" y="134" font-family="Menlo,Consolas,monospace" font-size="13" fill="#F4F7F5">tests/ · 44 Playwright</text>
+<text x="790" y="160" font-size="13" fill="#ABC0C8">oracle from the spec</text>
+<text x="790" y="182" font-size="13" fill="#ABC0C8">golden payload + mutants</text>
+<text x="790" y="204" font-size="13" fill="#ABC0C8">page objects · API client</text>
+<text x="790" y="226" font-size="13" fill="#ABC0C8">case_key · AC · bug · tags</text>
+<text x="790" y="252" font-family="Menlo,Consolas,monospace" font-size="12" fill="#8FA6B0">docs/TRACEABILITY.md</text>
+
+<!-- 5 prove -->
+<rect x="1040" y="76" width="200" height="86" rx="14" fill="#2A1618" stroke="#FB8176" stroke-opacity=".6"/>
+<text x="1060" y="104" font-size="15" font-weight="bold" fill="#FB8176">main · bugs open</text>
+<text x="1060" y="130" font-family="Menlo,Consolas,monospace" font-size="13" fill="#FB8176">36 failed</text>
+<text x="1060" y="150" font-family="Menlo,Consolas,monospace" font-size="13" fill="#55DFBD"> 8 passed</text>
+<rect x="1040" y="180" width="200" height="86" rx="14" fill="#0E2A22" stroke="#55DFBD"/>
+<text x="1060" y="208" font-size="15" font-weight="bold" fill="#55DFBD">fixes · 1 commit/bug</text>
+<text x="1060" y="234" font-family="Menlo,Consolas,monospace" font-size="13" fill="#55DFBD">44 passed</text>
+<text x="1060" y="254" font-size="12" fill="#8FA6B0">proves every test</text>
+
+<!-- arrows -->
+<path d="M230 120H262" stroke="#55DFBD" stroke-width="2" marker-end="url(#a)"/>
+<path d="M230 222H262" stroke="#55DFBD" stroke-width="2" marker-end="url(#a)"/>
+<path d="M470 120H502" stroke="#55DFBD" stroke-width="2" marker-end="url(#a)"/>
+<path d="M470 222H502" stroke="#55DFBD" stroke-width="2" marker-end="url(#a)"/>
+<path d="M730 170H762" stroke="#FB8176" stroke-width="2" marker-end="url(#r)"/>
+<path d="M1000 120H1032" stroke="#FB8176" stroke-width="2" marker-end="url(#r)"/>
+<path d="M1000 222H1032" stroke="#55DFBD" stroke-width="2" marker-end="url(#a)"/>
+
+<!-- bottom: CI + AI -->
+<rect x="40" y="304" width="580" height="130" rx="14" fill="#0D2638" stroke="#214456"/>
+<text x="60" y="334" font-size="15" font-weight="bold" fill="#F4F7F5">CI gate · .github/workflows/qa.yml</text>
+<text x="60" y="362" font-size="13" fill="#ABC0C8">e2e job: npm ci → Chromium → npm test → HTML report artifact</text>
+<text x="60" y="386" font-size="13" fill="#ABC0C8">performance job: app up → perf/latency.mjs (budgets, exit 1 if broken)</text>
+<text x="60" y="414" font-family="Menlo,Consolas,monospace" font-size="13" fill="#FB8176">main: red by design</text>
+<text x="260" y="414" font-family="Menlo,Consolas,monospace" font-size="13" fill="#55DFBD">fixes: green</text>
+
+<rect x="660" y="304" width="580" height="130" rx="14" fill="#0D2638" stroke="#214456"/>
+<text x="680" y="334" font-size="15" font-weight="bold" fill="#F4F7F5">AI, driven by context · AGENTS.md + CLAUDE.md</text>
+<text x="680" y="362" font-size="13" fill="#ABC0C8">AI reads, probes, scripts and drafts · I set risk, verdicts, standard</text>
+<text x="680" y="386" font-size="13" fill="#ABC0C8">nothing reported until reproduced · every red test triaged</text>
+<text x="680" y="414" font-family="Menlo,Consolas,monospace" font-size="13" fill="#FFC56E">ai/README.md: delegated · verified · discarded</text>
+</g>
+</svg>

@@ -1,0 +1,145 @@
+<!doctype html>
+<!-- Kids' explainer for the README. Each frame is drawn from ?t=<seconds>&lang=en|es; docs/scenes/export.mjs turns it into GIF/MP4. -->
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { width: 960px; height: 540px; overflow: hidden; background: #071B2B; color: #F4F7F5; font: 24px/1.35 -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+  .scene { position: absolute; inset: 0; padding: 44px 56px; display: none; }
+  .scene.on { display: block; }
+  .kicker { font: 15px Menlo, Consolas, monospace; letter-spacing: 2.5px; color: #8FA6B0; text-transform: uppercase; }
+  h1 { font-size: 34px; margin: 10px 0 26px; }
+  .say { font-size: 25px; color: #ABC0C8; max-width: 840px; }
+  .fade { opacity: 0; transform: translateY(10px); }
+  .row { display: flex; gap: 16px; margin-top: 26px; flex-wrap: wrap; }
+  .card { background: #0D2638; border: 1px solid #214456; border-radius: 14px; padding: 16px 18px; font-size: 20px; }
+  .red { color: #FB8176; border-color: #FB8176; background: #2A1618; }
+  .green { color: #55DFBD; border-color: #55DFBD; background: #0E2A22; }
+  .amber { color: #FFC56E; border-color: #FFC56E; background: #2A2412; }
+  .mono { font-family: Menlo, Consolas, monospace; font-size: 19px; }
+  .bubble { position: relative; display: inline-block; background: #F4F7F5; color: #071B2B; border-radius: 18px; padding: 18px 24px; font-size: 26px; font-weight: 600; margin-top: 18px; }
+  .bubble:after { content: ""; position: absolute; left: 40px; bottom: -18px; border: 10px solid transparent; border-top: 12px solid #F4F7F5; }
+  .face { font-size: 64px; margin-top: 28px; }
+  .bar { position: absolute; left: 0; bottom: 0; height: 6px; background: #55DFBD; }
+  .dots { position: absolute; right: 56px; bottom: 22px; font: 14px Menlo, monospace; color: #8FA6B0; }
+  .shelf { display: flex; gap: 14px; margin-top: 22px; }
+  .item { width: 150px; height: 120px; border-radius: 14px; background: #0D2638; border: 1px solid #214456; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 17px; color: #ABC0C8; }
+  .item b { font-size: 38px; }
+  .tests div { font: 20px Menlo, Consolas, monospace; margin: 8px 0; }
+  .big { font-size: 64px; font-weight: 800; }
+  .row + .say { margin-top: 28px; }
+</style>
+</head>
+<body>
+<div id="s1" class="scene">
+  <div class="kicker" data-i18n="k1"></div>
+  <h1 data-i18n="t1"></h1>
+  <p class="say fade" data-at="0.3" data-i18n="s1"></p>
+  <div class="shelf">
+    <div class="item fade" data-at="0.9"><b>☕</b><span data-i18n="mug"></span>$8.35</div>
+    <div class="item fade" data-at="1.2"><b>🎧</b><span data-i18n="phones"></span>$49.99</div>
+    <div class="item fade" data-at="1.5"><b>🪑</b><span data-i18n="chair"></span>$129.00</div>
+    <div class="item fade" data-at="1.9" style="border-color:#55DFBD"><b>🛒</b><span data-i18n="cart"></span></div>
+  </div>
+</div>
+<div id="s2" class="scene">
+  <div class="kicker" data-i18n="k2"></div>
+  <h1 data-i18n="t2"></h1>
+  <div class="bubble fade" data-at="0.4" data-i18n="b2"></div>
+  <div class="face fade" data-at="0.4">😟</div>
+  <p class="say fade" data-at="1.6" data-i18n="s2"></p>
+</div>
+<div id="s3" class="scene">
+  <div class="kicker" data-i18n="k3"></div>
+  <h1 data-i18n="t3"></h1>
+  <p class="say fade" data-at="0.3" data-i18n="s3"></p>
+  <div class="row">
+    <div class="card amber mono fade" data-at="0.9">coupon "flock10"</div>
+    <div class="card amber mono fade" data-at="1.2">-2 chairs</div>
+    <div class="card amber mono fade" data-at="1.5">2 coupons</div>
+    <div class="card amber mono fade" data-at="1.8" data-i18n="c4"></div>
+    <div class="card amber mono fade" data-at="2.1" data-i18n="c5"></div>
+    <div class="card amber mono fade" data-at="2.4">"Ana García"</div>
+  </div>
+</div>
+<div id="s4" class="scene">
+  <div class="kicker" data-i18n="k4"></div>
+  <h1 data-i18n="t4"></h1>
+  <div class="row">
+    <div class="card red fade" data-at="0.3" style="width:820px">
+      <div class="mono" style="color:#FB8176">BUG-01 · Critical · P1</div>
+      <div style="color:#F4F7F5;margin:8px 0 12px" data-i18n="bugtitle"></div>
+      <div class="fade" data-at="1.0" style="color:#55DFBD" data-i18n="exp"></div>
+      <div class="fade" data-at="1.6" style="color:#FB8176" data-i18n="act"></div>
+      <div class="fade mono" data-at="2.2" style="color:#ABC0C8;margin-top:12px;font-size:16px" data-i18n="proof"></div>
+    </div>
+  </div>
+</div>
+<div id="s5" class="scene">
+  <div class="kicker" data-i18n="k5"></div>
+  <h1 data-i18n="t5"></h1>
+  <div class="tests">
+    <div class="fade" data-at="0.3" style="color:#FB8176">✗ [BUG-01] payment over $100 shows the confirmation</div>
+    <div class="fade" data-at="0.6" style="color:#FB8176">✗ [BUG-02] Ana can't open Bruno's order</div>
+    <div class="fade" data-at="0.9" style="color:#FB8176">✗ [BUG-06] "flock10" gives 10% off</div>
+    <div class="fade" data-at="1.2" style="color:#FB8176">✗ [BUG-07] 3 buyers, 2 chairs → one gets 409</div>
+    <div class="fade" data-at="1.5" style="color:#8FA6B0">  … 32 more, one or more per bug</div>
+  </div>
+  <p class="say fade" data-at="2.0" data-i18n="s5"></p>
+</div>
+<div id="s6" class="scene">
+  <div class="kicker" data-i18n="k6"></div>
+  <h1 data-i18n="t6"></h1>
+  <div class="row" style="align-items:center">
+    <div class="card red fade" data-at="0.3" style="text-align:center;width:300px"><div class="big">36</div><span data-i18n="redl"></span></div>
+    <div class="fade" data-at="0.9" style="font-size:54px;color:#55DFBD">→</div>
+    <div class="card green fade" data-at="1.2" style="text-align:center;width:300px"><div class="big">44/44</div><span data-i18n="greenl"></span></div>
+  </div>
+  <p class="say fade" data-at="1.9" data-i18n="s6"></p>
+</div>
+<div class="bar" id="bar"></div>
+<div class="dots" id="dots"></div>
+<script>
+const TEXT = {
+  en: {
+    k1: "Explained like you're 8 · 1/6", t1: "This is ShopNow, a small online shop", s1: "You pick things, put them in a cart and pay. Easy… when it works.",
+    mug: "mug", phones: "headphones", chair: "chair", cart: "cart",
+    k2: "2/6", t2: "But customers are complaining", b2: "\"It said my payment failed… but I was charged!\"", s2: "My job: find what is broken before more people get hurt.",
+    k3: "3/6", t3: "I shop like a careful person… and a sneaky one", s3: "First the normal things. Then the weird ones, to see if the shop notices:", c4: "someone else's order", c5: "3 buyers, 2 chairs",
+    k4: "4/6", t4: "Every surprise becomes a bug card with proof", bugtitle: "Payments over $100 are reported as failed but the customer is charged",
+    exp: "Should: show the order confirmation, charge once.", act: "Does: says \"couldn't process\", charges anyway, and charges again on retry.", proof: "steps · video · HTTP log · root cause → evidence/BUG-01/",
+    k5: "5/6", t5: "Each bug gets a robot check that is red today", s5: "Red means \"the bug is still there\". The checks name their bug.",
+    k6: "6/6", t6: "Fix the bug, and the same check turns green", redl: "red on main", greenl: "green on fixes", s6: "Then it stays as a guard, so the bug can't sneak back in.",
+  },
+  es: {
+    k1: "Explicado como para un niño de 8 años · 1/6", t1: "Esta es ShopNow, una tienda en línea pequeña", s1: "Eliges cosas, las pones en el carrito y pagas. Fácil… cuando funciona.",
+    mug: "taza", phones: "audífonos", chair: "silla", cart: "carrito",
+    k2: "2/6", t2: "Pero los clientes se están quejando", b2: "\"Me dijo que el pago falló… ¡y sí me cobraron!\"", s2: "Mi trabajo: encontrar lo que está roto antes de que le pase a más gente.",
+    k3: "3/6", t3: "Compro como alguien cuidadoso… y como alguien tramposo", s3: "Primero lo normal. Después lo raro, a ver si la tienda se da cuenta:", c4: "la orden de otro", c5: "3 compradores, 2 sillas",
+    k4: "4/6", t4: "Cada sorpresa se vuelve una ficha de bug con pruebas", bugtitle: "Los pagos de más de $100 dicen que fallaron, pero sí cobran",
+    exp: "Debería: mostrar la confirmación y cobrar una vez.", act: "Hace: dice \"no se pudo procesar\", cobra igual y vuelve a cobrar si reintentas.", proof: "pasos · video · log HTTP · causa raíz → evidence/BUG-01/",
+    k5: "5/6", t5: "Cada bug tiene un chequeo robot que hoy sale en rojo", s5: "Rojo quiere decir \"el bug sigue ahí\". Cada chequeo nombra su bug.",
+    k6: "6/6", t6: "Arreglas el bug y el mismo chequeo se pone verde", redl: "rojo en main", greenl: "verde en fixes", s6: "Y se queda de guardia, para que el bug no vuelva a colarse.",
+  },
+};
+const SCENE = 3.4, TOTAL = SCENE * 6;
+const q = new URLSearchParams(location.search);
+const lang = q.get("lang") === "es" ? "es" : "en";
+document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = TEXT[lang][el.dataset.i18n]; });
+window.render = (t) => {
+  const i = Math.min(5, Math.floor(t / SCENE));
+  const local = t - i * SCENE;
+  document.querySelectorAll(".scene").forEach((s, n) => s.classList.toggle("on", n === i));
+  document.querySelectorAll(`#s${i + 1} .fade`).forEach((el) => {
+    const k = Math.max(0, Math.min(1, (local - Number(el.dataset.at)) / 0.35));
+    el.style.opacity = k; el.style.transform = `translateY(${(1 - k) * 10}px)`;
+  });
+  document.getElementById("bar").style.width = `${(t / TOTAL) * 100}%`;
+  document.getElementById("dots").textContent = "●".repeat(i + 1) + "○".repeat(5 - i);
+};
+window.TOTAL = TOTAL;
+render(Number(q.get("t") ?? 0));
+</script>
+</body>
+</html>
