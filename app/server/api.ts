@@ -180,6 +180,10 @@ api.post("/checkout", requireUser, async (req, res) => {
     lines.push({ productId: product.id, name: product.name, price: product.price, quantity });
   }
 
+  if (coupons !== undefined && !Array.isArray(coupons)) {
+    res.status(400).json({ error: "Coupons must be a list." });
+    return;
+  }
   const codes: string[] = Array.isArray(coupons) ? coupons.map(String) : [];
   const appliedCoupons: Coupon[] = [];
   for (const code of codes) {
