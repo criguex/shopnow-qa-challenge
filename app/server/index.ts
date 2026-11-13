@@ -19,6 +19,13 @@ const webRoot = realpathSync.native(join(dirname(fileURLToPath(import.meta.url))
 const app = express();
 app.use(express.json());
 app.use("/api", api);
+app.use("/api", (err: { type?: string }, _req: express.Request, res: express.Response, next: express.NextFunction) => {
+  if (err?.type === "entity.parse.failed") {
+    res.status(400).json({ error: "The request body is not valid JSON." });
+    return;
+  }
+  next(err);
+});
 
 const vite = await createViteServer({
   root: webRoot,
