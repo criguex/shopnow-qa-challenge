@@ -17,7 +17,7 @@ function findCoupon(code: string): Coupon | null {
   const typed = code.trim();
   const key = Object.keys(COUPONS).find((k) => k.toLowerCase() === typed.toLowerCase());
   if (!key) return null;
-  return { code: typed, percent: COUPONS[typed] ?? 0 };
+  return { code: key, percent: COUPONS[key] };
 }
 
 function formatOrderDate(iso: string) {
