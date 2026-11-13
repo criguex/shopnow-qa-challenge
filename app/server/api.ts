@@ -141,7 +141,15 @@ api.post("/checkout", requireUser, async (req, res) => {
     res.status(400).json({ error: "Your cart is empty." });
     return;
   }
-  if (!shipping?.name?.trim() || !shipping?.address?.trim()) {
+  if (items.some((item) => typeof item !== "object" || item === null)) {
+    res.status(400).json({ error: "Invalid cart items." });
+    return;
+  }
+  if (typeof shipping?.name !== "string" || typeof shipping?.address !== "string") {
+    res.status(400).json({ error: "Please fill in the shipping details." });
+    return;
+  }
+  if (!shipping.name.trim() || !shipping.address.trim()) {
     res.status(400).json({ error: "Please fill in the shipping details." });
     return;
   }
